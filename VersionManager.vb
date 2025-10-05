@@ -12,7 +12,7 @@ Namespace MoneyMind
         ''' ⚠️ VERSIONE CORRENTE DELL'APPLICAZIONE - MODIFICA SOLO QUESTO VALORE ⚠️
         ''' Formato: Major.Minor.Patch (es. 1.4.12)
         ''' </summary>
-        Public Const CURRENT_VERSION As String = "1.4.12"
+        Public Const CURRENT_VERSION As String = "1.4.13"
 
         ''' <summary>
         ''' Ottiene la versione corrente dell'applicazione

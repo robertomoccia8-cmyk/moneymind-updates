@@ -1,0 +1,625 @@
+<Window x:Class="MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="💰 MoneyMind - Gestione Finanze Personali"
+        Height="800" Width="1400"
+        MinHeight="600" MinWidth="1000"
+        Background="{StaticResource BackgroundPrimaryBrush}"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Icon="/Icon/icona.png"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        RenderOptions.ClearTypeHint="Enabled"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+    
+    <Window.Resources>
+        <!-- Storyboards for animations -->
+        <Storyboard x:Key="FadeInAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                           From="0" To="1" Duration="0:0:0.4"
+                           DecelerationRatio="0.7"/>
+        </Storyboard>
+        
+        <Storyboard x:Key="SlideInFromLeftAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="(Canvas.Left)" 
+                           From="-200" To="0" Duration="0:0:0.5"
+                           DecelerationRatio="0.8"/>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                           From="0" To="1" Duration="0:0:0.4"/>
+        </Storyboard>
+        
+        <!-- Info Card Template - Card unificata con header integrato -->
+        <ControlTemplate x:Key="InfoCardTemplate" TargetType="ContentControl">
+            <Border Effect="{StaticResource DropShadowLight}" Margin="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header etichetta - altezza fissa 42px -->
+                    <Border Grid.Row="0"
+                           CornerRadius="8,8,0,0"
+                           BorderBrush="{StaticResource BorderLightBrush}"
+                           BorderThickness="1,1,1,0"
+                           Height="42">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#F8F9FA" Offset="0"/>
+                                <GradientStop Color="#E9ECEF" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+
+                        <Grid>
+                            <!-- Linea decorativa superiore -->
+                            <Rectangle Height="1" VerticalAlignment="Top"
+                                      Fill="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Foreground}"
+                                      Opacity="0.3"/>
+
+                            <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Tag}"
+                                      FontSize="11"
+                                      Foreground="#495057"
+                                      FontWeight="SemiBold"
+                                      FontFamily="Segoe UI Semibold"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      TextAlignment="Center"
+                                      TextWrapping="NoWrap"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Card principale - nessun margine, perfettamente attaccata -->
+                    <Border Grid.Row="1"
+                           Background="White"
+                           CornerRadius="0,0,8,8"
+                           BorderBrush="{StaticResource BorderLightBrush}"
+                           BorderThickness="1"
+                           Padding="20,18"
+                           MinHeight="100">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                      Text="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Content}"
+                                      FontSize="{StaticResource FontSizeHeading}"
+                                      FontWeight="Bold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"/>
+
+                            <!-- Barra colorata "segnalibro" -->
+                            <Rectangle Grid.Row="1" Height="4"
+                                      Fill="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Foreground}"
+                                      Margin="0,14,0,0"
+                                      RadiusX="2" RadiusY="2"
+                                      Opacity="0.85"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+
+        <!-- Modern Button Style -->
+        <Style TargetType="Button" x:Key="ModernButton">
+            <Setter Property="Background" Value="#4A90E2"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,7"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#5BA0F2"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#3A80D2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Header -->
+            <RowDefinition Height="Auto"/>
+            <!-- Stats Dashboard -->
+            <RowDefinition Height="Auto"/>
+            <!-- Input Panel -->
+            <RowDefinition Height="Auto"/>
+            <!-- Main Content -->
+            <RowDefinition Height="*"/>
+            <!-- Status Bar -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBlueBrush}" 
+                Effect="{StaticResource DropShadowMedium}">
+            <Grid Margin="{StaticResource MarginLG}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="💰" FontSize="32" Margin="0,0,16,0"/>
+                    <StackPanel>
+                        <TextBlock Text="MoneyMind" 
+                                  FontSize="24" FontWeight="Bold" 
+                                  Foreground="White"/>
+                        <TextBlock Text="Gestione Finanze Personali" 
+                                  FontSize="12" 
+                                  Foreground="#E3F2FD" Margin="0,-4,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="BtnHelp" Style="{StaticResource ModernButtonSecondary}"
+                           Content="❓ Guida"
+                           Margin="8,0" Click="BtnHelp_Click"
+                           MinWidth="110"
+                           ToolTip="Mostra la guida rapida per utilizzare MoneyMind"/>
+                    <Button Style="{StaticResource ModernButtonSecondary}"
+                           Content="🔄 Aggiornamenti"
+                           Margin="8,0" Click="BtnAggiornamenti_Click"
+                           MinWidth="150"
+                           ToolTip="Controlla aggiornamenti disponibili per MoneyMind"/>
+                    <Button x:Name="BtnCambiaConto"
+                           Style="{StaticResource ModernButtonSecondary}"
+                           Content="🔄 Cambia Conto"
+                           Margin="8,0" Click="BtnCambiaConto_Click"
+                           MinWidth="150"
+                           ToolTip="Torna alla schermata di selezione conto"/>
+                    <Button Style="{StaticResource ModernButtonSecondary}"
+                           Content="⚙️ Impostazioni"
+                           Margin="8,0" Click="BtnImpostazioni_Click"
+                           MinWidth="140"
+                           ToolTip="Configura le impostazioni dell'applicazione"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- STATS DASHBOARD -->
+        <Border Grid.Row="1" Background="{StaticResource BackgroundSecondaryBrush}" 
+                BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,0,0,1"
+                Padding="{StaticResource MarginLG}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Saldo Totale con Occhio Dedicato -->
+                <Grid Grid.Column="0">
+                    <ContentControl x:Name="CardSaldoTotale"
+                                   Template="{StaticResource InfoCardTemplate}"
+                                   Content="{Binding SaldoTotale, StringFormat=C2}"
+                                   Tag="Saldo Totale"
+                                   Foreground="{StaticResource DataNeutralBrush}"/>
+
+                    <!-- Occhio Privacy Solo per Saldo Totale -->
+                    <Button x:Name="BtnTogglePrivacySaldoTotale"
+                            Click="BtnTogglePrivacySaldoTotale_Click"
+                            Style="{StaticResource ModernButton}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Margin="5"
+                            Padding="3"
+                            ToolTip="Nascondi/Mostra solo il Saldo Totale"
+                            Height="25" Width="25">
+                        <TextBlock x:Name="IconPrivacySaldoTotale" Text="👁️" FontSize="12"/>
+                    </Button>
+                </Grid>
+                
+                <!-- Entrate Mese -->
+                <ContentControl Grid.Column="1" x:Name="CardEntrateMese"
+                               Template="{StaticResource InfoCardTemplate}"
+                               Content="{Binding EntrateMese, StringFormat=C2}" 
+                               Tag="Entrate del Mese"
+                               Foreground="{StaticResource DataPositiveBrush}"/>
+                
+                <!-- Uscite Mese -->
+                <ContentControl Grid.Column="2" x:Name="CardUsciteMese"
+                               Template="{StaticResource InfoCardTemplate}"
+                               Content="{Binding UsciteMese, StringFormat=C2}" 
+                               Tag="Uscite del Mese"
+                               Foreground="{StaticResource DataNegativeBrush}"/>
+                
+                <!-- Risparmio Mese -->
+                <ContentControl Grid.Column="3" x:Name="CardRisparmioMese"
+                               Template="{StaticResource InfoCardTemplate}"
+                               Content="{Binding RisparmioMese, StringFormat=C2}" 
+                               Tag="Risparmio del Mese"
+                               Foreground="{StaticResource SecondaryGreenBrush}"/>
+                
+                <!-- Transazioni Mese -->
+                <ContentControl Grid.Column="4" x:Name="CardTransazioniMese"
+                               Template="{StaticResource InfoCardTemplate}"
+                               Content="{Binding TransazioniMese}"
+                               Tag="Transazioni del Mese"
+                               Foreground="{StaticResource PrimaryBlueBrush}"/>
+
+                <!-- Privacy Toggle Button -->
+                <Button Grid.Column="5" x:Name="BtnTogglePrivacy"
+                        Click="BtnTogglePrivacy_Click"
+                        Style="{StaticResource ModernButton}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Margin="10,0,0,0"
+                        Padding="8"
+                        ToolTip="Attiva/Disattiva modalità privacy per nascondere i valori monetari"
+                        Height="40" Width="40">
+                    <TextBlock x:Name="IconPrivacy"
+                               Text="👁️"
+                               FontSize="20"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                </Button>
+            </Grid>
+        </Border>
+        
+        <!-- INPUT PANEL -->
+        <Border Grid.Row="2" Style="{StaticResource ModernCard}" 
+                Margin="{StaticResource MarginMD}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" Text="Data:" 
+                          VerticalAlignment="Center" FontWeight="SemiBold"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          Margin="0,0,8,0"/>
+                
+                <DatePicker Grid.Column="1" x:Name="DtpData" 
+                           SelectedDate="{x:Static System:DateTime.Today}"
+                           FontFamily="{StaticResource PrimaryFontFamily}"
+                           FontSize="{StaticResource FontSizeBody}"
+                           Margin="0,0,16,0" xmlns:System="clr-namespace:System;assembly=mscorlib"/>
+                
+                <TextBlock Grid.Column="2" Text="Importo:" 
+                          VerticalAlignment="Center" FontWeight="SemiBold"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          Margin="0,0,8,0"/>
+                
+                <TextBox Grid.Column="3" x:Name="TxtImporto" 
+                        Style="{StaticResource ModernTextBox}"
+                        FontFamily="{StaticResource MonoFontFamily}"
+                        TextAlignment="Right"
+                        Margin="0,0,16,0"
+                        ToolTip="Usa + per entrate, - per uscite"/>
+                
+                <TextBlock Grid.Column="4" Text="Descrizione:" 
+                          VerticalAlignment="Center" FontWeight="SemiBold"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          Margin="0,0,8,0"/>
+                
+                <TextBox Grid.Column="5" x:Name="TxtDescrizione" 
+                        Style="{StaticResource ModernTextBox}"
+                        Margin="0,0,16,0"/>
+                
+                <StackPanel Grid.Column="6" Orientation="Horizontal">
+                    <Button x:Name="BtnAggiungi" 
+                           Style="{StaticResource ModernButtonPrimary}" 
+                           Content="➕ Aggiungi" 
+                           Click="BtnAggiungi_Click"
+                           Margin="0,0,8,0"
+                           ToolTip="Aggiungi una nuova transazione compilando i campi sopra"/>
+                    
+                    <Button x:Name="BtnClassificaVeloce" 
+                           Style="{StaticResource ModernButtonSuccess}" 
+                           Content="🏷️ Classifica" 
+                           Click="BtnClassifica_Click"
+                           Margin="0,0,8,0"
+                           ToolTip="Classifica rapidamente le transazioni selezionate con categorie automatiche"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Row="3" Margin="{StaticResource MarginMD}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="600"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- TRANSACTION LIST -->
+            <Border Grid.Column="0" Style="{StaticResource ModernCard}" Margin="0,0,8,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Filter Bar -->
+                    <Border Grid.Row="0" Background="{StaticResource BackgroundSecondaryBrush}" 
+                           Padding="{StaticResource MarginMD}" Margin="-16,-16,-16,0"
+                           CornerRadius="8,8,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0" Text="🔍 Cerca:" 
+                                      VerticalAlignment="Center" FontWeight="SemiBold"
+                                      Margin="0,0,8,0"/>
+                            
+                            <TextBox Grid.Column="1" x:Name="TxtSearch" 
+                                    Style="{StaticResource ModernTextBox}"
+                                    FontSize="11" Height="32"
+                                    TextChanged="TxtSearch_TextChanged"
+                                    ToolTip="Cerca transazioni per descrizione, importo o categoria"/>
+                            
+                            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                <Button x:Name="BtnImportaExcel" 
+                                       Style="{StaticResource ModernButtonSecondary}" 
+                                       Content="📁 Importa" 
+                                       Click="BtnImportaExcel_Click"
+                                       Height="32" Padding="12,4"
+                                       Margin="8,0"
+                                       ToolTip="Importa transazioni da file Excel (.xlsx) o CSV con mapping automatico dei campi"/>
+                                
+                                <Button x:Name="BtnAnalisi" 
+                                       Style="{StaticResource ModernButtonSecondary}" 
+                                       Content="📊 Analisi" 
+                                       Click="BtnAnalisi_Click"
+                                       Height="32" Padding="12,4"
+                                       Margin="8,0"
+                                       ToolTip="Visualizza analisi dettagliate delle spese e trend finanziari"/>
+                                
+                                <Button x:Name="BtnDashboard"
+                                       Style="{StaticResource ModernButtonPrimary}"
+                                       Content="📈 Budget &amp; Obiettivi"
+                                       Click="BtnDashboard_Click"
+                                       Height="32" Padding="20,4"
+                                       MinWidth="180"
+                                       Margin="8,0"
+                                       ToolTip="Gestisci budget per categoria e traccia obiettivi di risparmio"/>
+
+                                <Button x:Name="BtnEliminaSelezionate"
+                                       Style="{StaticResource ModernButtonDanger}"
+                                       Content="🗑️ Elimina Selezione"
+                                       Click="BtnEliminaSelezionate_Click"
+                                       Height="32" Padding="12,4"
+                                       Margin="8,0"
+                                       IsEnabled="False"
+                                       ToolTip="Elimina le transazioni selezionate (Ctrl+Click per selezionare più transazioni)"/>
+
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Data Grid -->
+                    <DataGrid Grid.Row="1" x:Name="DgvTransazioni"
+                             Style="{StaticResource ModernDataGrid}"
+                             Margin="0,16,0,0"
+                             SelectionMode="Extended"
+                             SelectionUnit="FullRow"
+                             SelectionChanged="DgvTransazioni_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Data" Binding="{Binding DataTransazione, StringFormat=dd/MM/yyyy}" Width="100"/>
+                            <DataGridTextColumn Header="Importo" Binding="{Binding ImportoFormatted}" Width="120">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Right"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPositive}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource DataPositiveBrush}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsPositive}" Value="False">
+                                                <Setter Property="Foreground" Value="{StaticResource DataNegativeBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Descrizione" Binding="{Binding Descrizione}" Width="*"/>
+                            <DataGridTextColumn Header="Macro Categoria" Binding="{Binding MacroCategoriaDisplay}" Width="150"/>
+                            <DataGridTextColumn Header="Categoria" Binding="{Binding CategoriaDisplay}" Width="150"/>
+                            <DataGridTemplateColumn Header="Azioni" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🗑️" 
+                                               Style="{StaticResource ModernButtonDanger}"
+                                               Width="30" Height="30"
+                                               Padding="4"
+                                               Click="BtnElimina_Click"
+                                               CommandParameter="{Binding}"
+                                               ToolTip="Elimina transazione"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+            
+            <!-- SIDE PANEL -->
+            <Border Grid.Column="1" Style="{StaticResource ModernCard}" 
+                   MinWidth="280" MaxWidth="350" Width="300" Margin="8,0,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <TextBlock Text="📋 Azioni Rapide" 
+                                  FontSize="{StaticResource FontSizeSubheading}" 
+                                  FontWeight="Bold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,16"/>
+                        
+                        <Button x:Name="BtnClassifica"
+                               Style="{StaticResource ModernButtonPrimary}"
+                               Content="🎯 Centro Classificazione Intelligente"
+                               Click="BtnClassifica_Click"
+                               HorizontalAlignment="Stretch"
+                               Margin="0,0,0,8"/>
+
+                        <Button x:Name="BtnPattern"
+                               Style="{StaticResource ModernButtonSecondary}"
+                               Content="🔄 Pattern Manager"
+                               Click="BtnPattern_Click"
+                               HorizontalAlignment="Stretch"
+                               Margin="0,0,0,8"
+                               ToolTip="Gestisci pattern di classificazione automatica"/>
+
+                        <Button x:Name="BtnConfiguraStipendi"
+                               Style="{StaticResource ModernButtonSecondary}"
+                               Content="💰 Configura Stipendi"
+                               Click="BtnConfiguraStipendi_Click"
+                               HorizontalAlignment="Stretch"
+                               Margin="0,0,0,8"/>
+
+                        <Button x:Name="BtnRilevaDuplicati"
+                               Style="{StaticResource ModernButtonWarning}"
+                               Content="🔍 Rileva Duplicati"
+                               Click="BtnRilevaDuplicati_Click"
+                               HorizontalAlignment="Stretch"
+                               Margin="0,0,0,8"
+                               ToolTip="Trova e gestisci transazioni duplicate (stessa data, importo e descrizione)"/>
+
+                        <Separator Margin="0,16,0,16"/>
+                        
+                        <TextBlock Text="ℹ️ Informazioni" 
+                                  FontSize="{StaticResource FontSizeSubheading}" 
+                                  FontWeight="Bold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,16"/>
+                        
+                        <Border Background="{StaticResource BackgroundSecondaryBrush}" 
+                               CornerRadius="{StaticResource BorderRadiusSmall}" 
+                               Padding="{StaticResource PaddingMD}"
+                               Margin="0,0,0,16">
+                            <TextBlock x:Name="LblInfoDettagliata" 
+                                      Text="Seleziona una transazione per vedere i dettagli"
+                                      FontSize="{StaticResource FontSizeBody}" 
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      TextWrapping="Wrap"
+                                      LineHeight="18"/>
+                        </Border>
+                        
+                        <!-- Statistiche rapide -->
+                        <TextBlock Text="📊 Statistiche Database" 
+                                  FontSize="{StaticResource FontSizeSubheading}" 
+                                  FontWeight="Bold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+                        
+                        <Border Background="{StaticResource BackgroundSecondaryBrush}" 
+                               CornerRadius="{StaticResource BorderRadiusSmall}" 
+                               Padding="{StaticResource PaddingSM}">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Totale transazioni:" 
+                                              FontSize="{StaticResource FontSizeCaption}"/>
+                                    <TextBlock Grid.Column="1" x:Name="LblTotaleTransazioni" 
+                                              Text="0" FontWeight="SemiBold"
+                                              FontSize="{StaticResource FontSizeCaption}"/>
+                                </Grid>
+                                
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Pattern attivi:" 
+                                              FontSize="{StaticResource FontSizeCaption}"/>
+                                    <TextBlock Grid.Column="1" x:Name="LblPatternAttivi" 
+                                              Text="0" FontWeight="SemiBold"
+                                              FontSize="{StaticResource FontSizeCaption}"/>
+                                </Grid>
+                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Ultimo aggiornamento:" 
+                                              FontSize="{StaticResource FontSizeCaption}"/>
+                                    <TextBlock Grid.Column="1" x:Name="LblUltimoAggiornamento" 
+                                              Text="Mai" FontWeight="SemiBold"
+                                              FontSize="{StaticResource FontSizeCaption}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+        
+        <!-- STATUS BAR -->
+        <Border Grid.Row="4" Background="{StaticResource BackgroundSecondaryBrush}" 
+                BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,1,0,0"
+                Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" x:Name="LblStatus" 
+                          Text="Pronto" 
+                          FontSize="{StaticResource FontSizeCaption}"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          VerticalAlignment="Center"/>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="Database:" 
+                              FontSize="{StaticResource FontSizeCaption}"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,4,0"/>
+                    <Ellipse x:Name="DatabaseStatus" Width="8" Height="8" 
+                            Fill="{StaticResource DataPositiveBrush}"/>
+                    <TextBlock Text="🌐 Online" 
+                              FontSize="{StaticResource FontSizeCaption}"
+                              Foreground="{StaticResource DataPositiveBrush}"
+                              VerticalAlignment="Center"
+                              Margin="4,0,16,0"/>
+                    <TextBlock x:Name="LblVersion" 
+                              Text="v1.0.1" 
+                              FontSize="{StaticResource FontSizeCaption}"
+                              Foreground="{StaticResource TextMutedBrush}"
+                              VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

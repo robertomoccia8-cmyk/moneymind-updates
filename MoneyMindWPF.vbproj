@@ -8,14 +8,15 @@
     <RootNamespace>MoneyMind</RootNamespace>
     <AssemblyName>MoneyMind</AssemblyName>
     <!-- ⚠️ LA VERSIONE È CENTRALIZZATA IN VersionManager.vb - MODIFICA SOLO QUELLO! ⚠️ -->
-    <Version>1.4.12</Version>
+    <Version>1.4.13</Version>
     <ApplicationIcon>Icon\app.ico</ApplicationIcon>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <PublishTrimmed>false</PublishTrimmed>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +43,12 @@
   <ItemGroup>
     <Resource Include="Icon\icona.png" />
     <Resource Include="Icon\app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="MigraDatiVecchioDatabase.vb" />
+    <Compile Remove="MigrazioneDati\**" />
+    <Compile Remove="FixPatternCorrotti.vb" />
   </ItemGroup>
 
 </Project>

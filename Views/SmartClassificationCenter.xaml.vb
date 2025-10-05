@@ -31,6 +31,7 @@ Public Class TransactionPreview
             If _macroCategoria <> value Then
                 _macroCategoria = value
                 OnPropertyChanged(NameOf(MacroCategoria))
+                OnPropertyChanged(NameOf(MacroCategoriaDisplay))
             End If
         End Set
     End Property
@@ -44,6 +45,7 @@ Public Class TransactionPreview
             If _categoria <> value Then
                 _categoria = value
                 OnPropertyChanged(NameOf(Categoria))
+                OnPropertyChanged(NameOf(CategoriaDisplay))
             End If
         End Set
     End Property
@@ -54,7 +56,7 @@ Public Class TransactionPreview
     Public Property ConfidenzaFormatted As String
     Public Property MetodoClassificazione As String
     Public Property OriginalTransaction As Transazione
-    
+
     Private _isSelected As Boolean = True
     Public Property IsSelected As Boolean
         Get
@@ -64,16 +66,34 @@ Public Class TransactionPreview
             If _isSelected <> value Then
                 _isSelected = value
                 OnPropertyChanged(NameOf(IsSelected))
-                
+
                 ' Notifica il cambio di selezione alla finestra principale
                 RaiseEvent SelectionChanged(Me)
             End If
         End Set
     End Property
-    
+
+    ''' <summary>
+    ''' MacroCategoria con fallback a "Non Classificata" se vuota
+    ''' </summary>
+    Public ReadOnly Property MacroCategoriaDisplay As String
+        Get
+            Return If(String.IsNullOrWhiteSpace(_macroCategoria), "Non Classificata", _macroCategoria)
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Categoria con fallback a "Non Classificata" se vuota
+    ''' </summary>
+    Public ReadOnly Property CategoriaDisplay As String
+        Get
+            Return If(String.IsNullOrWhiteSpace(_categoria), "Non Classificata", _categoria)
+        End Get
+    End Property
+
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
     Public Event SelectionChanged(item As TransactionPreview)
-    
+
     Protected Sub OnPropertyChanged(propertyName As String)
         RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(propertyName))
     End Sub
@@ -1711,14 +1731,14 @@ Public Class SmartClassificationCenter
             transazione.Frequenza = risultato.Frequenza
             transazione.Stagionalita = risultato.Stagionalita
 
-            ' Salva nel database
+            ' Salva nel database PERSONALE (le transazioni sono nel DB del conto)
             Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
                 connection.Open()
 
-                Dim updateQuery = "UPDATE Transazioni SET 
-                                  MacroCategoria = @macro, Categoria = @cat, 
-                                  Necessita = @nec, Frequenza = @freq, 
-                                  Stagionalita = @stag 
+                Dim updateQuery = "UPDATE Transazioni SET
+                                  MacroCategoria = @macro, Categoria = @cat,
+                                  Necessita = @nec, Frequenza = @freq,
+                                  Stagionalita = @stag
                                   WHERE ID = @id"
 
                 Using cmd As New SQLiteCommand(updateQuery, connection)
@@ -1969,6 +1989,7 @@ Public Class SmartClassificationCenter
         Try
             _singleTransactionsList.Clear()
 
+            ' Le transazioni sono nel database PERSONALE
             Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
                 connection.Open()
 
@@ -2086,6 +2107,7 @@ Public Class SmartClassificationCenter
         Try
             _transazioni.Clear()
 
+            ' Le transazioni sono nel database PERSONALE
             Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
                 connection.Open()
 
@@ -2124,6 +2146,7 @@ Public Class SmartClassificationCenter
         Try
             _transazioni.Clear()
 
+            ' Le transazioni sono nel database PERSONALE
             Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
                 connection.Open()
 
@@ -2162,6 +2185,7 @@ Public Class SmartClassificationCenter
     ''' </summary>
     Private Async Function ResetAllClassifications() As Task
         Try
+            ' Le transazioni sono nel database PERSONALE
             Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
                 connection.Open()
 
@@ -2199,14 +2223,15 @@ Public Class SmartClassificationCenter
         Try
             ' CRITICAL FIX: Usa Dispatcher per operazioni thread-safe su ObservableCollection
             Await Dispatcher.InvokeAsync(Sub()
-                ' Disconnetti temporaneamente l'ItemsSource per evitare race condition
-                ManualTransactionsList.ItemsSource = Nothing
-                _manualTransactions.Clear()
-            End Sub)
+                                             ' Disconnetti temporaneamente l'ItemsSource per evitare race condition
+                                             ManualTransactionsList.ItemsSource = Nothing
+                                             _manualTransactions.Clear()
+                                         End Sub)
 
             ' Carica dati dal database (operazione in background)
             Dim tempTransactions As New List(Of ManualTransactionView)
 
+            ' Le transazioni sono nel database PERSONALE
             Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
                 Await connection.OpenAsync()
 
@@ -2240,15 +2265,15 @@ Public Class SmartClassificationCenter
 
             ' CRITICAL FIX: Aggiorna la collezione sul thread UI
             Await Dispatcher.InvokeAsync(Sub()
-                ' Popola la ObservableCollection
-                For Each item In tempTransactions
-                    _manualTransactions.Add(item)
-                Next
+                                             ' Popola la ObservableCollection
+                                             For Each item In tempTransactions
+                                                 _manualTransactions.Add(item)
+                                             Next
 
-                ' Ricollega l'ItemsSource SOLO DOPO aver popolato i dati
-                ManualTransactionsList.ItemsSource = _manualTransactions
-                TxtManualCount.Text = $"{_manualTransactions.Count} da classificare"
-            End Sub)
+                                             ' Ricollega l'ItemsSource SOLO DOPO aver popolato i dati
+                                             ManualTransactionsList.ItemsSource = _manualTransactions
+                                             TxtManualCount.Text = $"{_manualTransactions.Count} da classificare"
+                                         End Sub)
 
         Catch ex As Exception
             _logger?.LogError(ex, "Error loading manual transactions")
@@ -2304,7 +2329,7 @@ Public Class SmartClassificationCenter
     ''' </summary>
     Private Async Function CheckCategoriesExist(macroCategoria As String, categoria As String) As Task(Of (macroExists As Boolean, categoriaExists As Boolean))
         Try
-            Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
+            Using connection As New SQLiteConnection(GlobalDatabaseManager.GetConnectionString())
                 connection.Open()
 
                 ' Controlla MacroCategoria
@@ -2352,7 +2377,7 @@ Public Class SmartClassificationCenter
                 notificationMessage = $"✨ Nuova Categoria '{categoria}' creata nella MacroCategoria esistente!"
             End If
 
-            Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
+            Using connection As New SQLiteConnection(GlobalDatabaseManager.GetConnectionString())
                 connection.Open()
 
                 ' Verifica se il pattern esiste già
@@ -2363,20 +2388,16 @@ Public Class SmartClassificationCenter
 
                     If exists Then
                         ' Aggiorna pattern esistente
-                        Dim updateQuery = "UPDATE Pattern SET 
+                        Dim updateQuery = "UPDATE Pattern SET
                                          MacroCategoria = @macro, Categoria = @cat,
-                                         Necessita = @nec, Frequenza = @freq,
-                                         Stagionalita = @stag, Peso = Peso + 1,
-                                         Fonte = @fonte
+                                         Peso = Peso + 1,
+                                         TipoFonte = @fonte
                                          WHERE Parola = @parola"
 
                         Using updateCmd As New SQLiteCommand(updateQuery, connection)
                             updateCmd.Parameters.AddWithValue("@parola", TxtKeyword.Text.Trim())
                             updateCmd.Parameters.AddWithValue("@macro", macroCategoria)
                             updateCmd.Parameters.AddWithValue("@cat", categoria)
-                            updateCmd.Parameters.AddWithValue("@nec", GetComboBoxText(CmbNecessita))
-                            updateCmd.Parameters.AddWithValue("@freq", GetComboBoxText(CmbFrequenza))
-                            updateCmd.Parameters.AddWithValue("@stag", GetComboBoxText(CmbStagionalita))
                             updateCmd.Parameters.AddWithValue("@fonte", "Manuale")
 
                             Await Task.Run(Sub() updateCmd.ExecuteNonQuery())
@@ -2384,16 +2405,13 @@ Public Class SmartClassificationCenter
                     Else
                         ' Inserisci nuovo pattern
                         Dim insertQuery = "INSERT INTO Pattern
-                                         (Parola, MacroCategoria, Categoria, Necessita, Frequenza, Stagionalita, Peso, Fonte)
-                                         VALUES (@parola, @macro, @cat, @nec, @freq, @stag, 5, @fonte)"
+                                         (Parola, MacroCategoria, Categoria, TipoFonte, Peso)
+                                         VALUES (@parola, @macro, @cat, @fonte, 5)"
 
                         Using insertCmd As New SQLiteCommand(insertQuery, connection)
                             insertCmd.Parameters.AddWithValue("@parola", TxtKeyword.Text.Trim())
                             insertCmd.Parameters.AddWithValue("@macro", macroCategoria)
                             insertCmd.Parameters.AddWithValue("@cat", categoria)
-                            insertCmd.Parameters.AddWithValue("@nec", GetComboBoxText(CmbNecessita))
-                            insertCmd.Parameters.AddWithValue("@freq", GetComboBoxText(CmbFrequenza))
-                            insertCmd.Parameters.AddWithValue("@stag", GetComboBoxText(CmbStagionalita))
                             insertCmd.Parameters.AddWithValue("@fonte", "Manuale")
 
                             Await Task.Run(Sub() insertCmd.ExecuteNonQuery())
@@ -2454,6 +2472,7 @@ Public Class SmartClassificationCenter
         Try
             If _selectedManualTransaction Is Nothing Then Return
 
+            ' Le transazioni sono nel database PERSONALE
             Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
                 connection.Open()
 
@@ -2696,8 +2715,8 @@ Public Class SmartClassificationCenter
                 Debug.WriteLine($"DEBUG: Pattern 'Non Classificata' non salvato")
                 Return
             End If
-            
-            Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
+
+            Using connection As New SQLiteConnection(GlobalDatabaseManager.GetConnectionString())
                 connection.Open()
 
                 ' Verifica esistenza
@@ -2711,19 +2730,16 @@ Public Class SmartClassificationCenter
                     If Not exists Then
                         Debug.WriteLine($"DEBUG: Inserimento nuovo pattern nel database...")
                         ' Inserimento nuovo pattern
-                        Dim insertQuery = "INSERT INTO Pattern 
-                                         (Parola, MacroCategoria, Categoria, Necessita, Frequenza, Stagionalita, Peso, Fonte) 
-                                         VALUES (@parola, @macro, @cat, @nec, @freq, @stag, @peso, @fonte)"
+                        Dim insertQuery = "INSERT INTO Pattern
+                                         (Parola, MacroCategoria, Categoria, TipoFonte, Peso)
+                                         VALUES (@parola, @macro, @cat, @fonte, @peso)"
 
                         Using insertCmd As New SQLiteCommand(insertQuery, connection)
                             insertCmd.Parameters.AddWithValue("@parola", suggestion.ParolaChiave)
                             insertCmd.Parameters.AddWithValue("@macro", suggestion.MacroCategoria)
                             insertCmd.Parameters.AddWithValue("@cat", suggestion.Categoria)
-                            insertCmd.Parameters.AddWithValue("@nec", suggestion.Necessita)
-                            insertCmd.Parameters.AddWithValue("@freq", suggestion.Frequenza)
-                            insertCmd.Parameters.AddWithValue("@stag", suggestion.Stagionalita)
-                            insertCmd.Parameters.AddWithValue("@peso", suggestion.Peso)
                             insertCmd.Parameters.AddWithValue("@fonte", "AI")
+                            insertCmd.Parameters.AddWithValue("@peso", suggestion.Peso)
 
                             Await Task.Run(Sub() insertCmd.ExecuteNonQuery())
                             Debug.WriteLine($"DEBUG: Pattern inserito con successo nel database")
@@ -2906,17 +2922,17 @@ Public Class SmartClassificationCenter
     Private Function GetDistinctMacroCategories() As List(Of String)
         Try
             ' Usa il nuovo servizio con cache trasparente
-            Return MoneyMind.Services.CacheService.GetOrSet("macrocategories_smart_center", 
+            Return MoneyMind.Services.CacheService.GetOrSet("macrocategories_smart_center",
                 Function() MoneyMind.Services.PatternService.GetDistinctMacroCategories(), 5)
         Catch ex As Exception
             MoneyMind.Services.LoggingService.LogError("GetDistinctMacroCategories", ex)
             _logger?.LogError(ex, "Error getting macro categories")
-            
+
             ' Fallback al metodo originale in caso di errore
             Return GetDistinctMacroCategoriesLegacy()
         End Try
     End Function
-    
+
     ''' <summary>
     ''' Fallback method - mantiene logica originale per sicurezza
     ''' </summary>
@@ -2924,7 +2940,7 @@ Public Class SmartClassificationCenter
         Dim result As New List(Of String)()
 
         Try
-            Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
+            Using connection As New SQLiteConnection(GlobalDatabaseManager.GetConnectionString())
                 connection.Open()
                 ' Solo da Pattern per consistenza con PatternManagerWindow
                 Dim query = "SELECT DISTINCT MacroCategoria FROM Pattern 
@@ -2956,23 +2972,23 @@ Public Class SmartClassificationCenter
         Try
             ' Usa i nuovi servizi con cache
             If String.IsNullOrEmpty(macroCategoria) Then
-                Return MoneyMind.Services.CacheService.GetOrSet("categories_smart_center", 
+                Return MoneyMind.Services.CacheService.GetOrSet("categories_smart_center",
                     Function() MoneyMind.Services.PatternService.GetDistinctCategories(), 5)
             Else
                 ' Cache specifica per MacroCategoria
                 Dim cacheKey = $"categories_for_{macroCategoria.ToLowerInvariant()}_smart_center"
-                Return MoneyMind.Services.CacheService.GetOrSet(cacheKey, 
+                Return MoneyMind.Services.CacheService.GetOrSet(cacheKey,
                     Function() MoneyMind.Services.PatternService.GetCategoriesForMacroAsync(macroCategoria).Result, 10)
             End If
         Catch ex As Exception
             MoneyMind.Services.LoggingService.LogError("GetDistinctCategories", ex, $"MacroCategoria: {macroCategoria}")
             _logger?.LogError(ex, "Error getting categories")
-            
+
             ' Fallback al metodo originale
             Return GetDistinctCategoriesLegacy(macroCategoria)
         End Try
     End Function
-    
+
     ''' <summary>
     ''' Fallback method - mantiene logica originale per sicurezza
     ''' </summary>
@@ -2980,7 +2996,7 @@ Public Class SmartClassificationCenter
         Dim result As New List(Of String)()
 
         Try
-            Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
+            Using connection As New SQLiteConnection(GlobalDatabaseManager.GetConnectionString())
                 connection.Open()
                 Dim query As String
 
@@ -3219,7 +3235,7 @@ Public Class SmartClassificationCenter
             transazione.MacroCategoria = preview.MacroCategoria
             transazione.Categoria = preview.Categoria
 
-            ' Salva nel database
+            ' Salva nel database PERSONALE
             Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
                 connection.Open()
 
@@ -3395,9 +3411,9 @@ Public Class SmartClassificationCenter
 
             ' CRITICAL FIX: Rimuovi dalla ObservableCollection in modo thread-safe
             Await Dispatcher.InvokeAsync(Sub()
-                _manualTransactions.Remove(_selectedManualTransaction)
-                TxtManualCount.Text = $"{_manualTransactions.Count} da classificare"
-            End Sub)
+                                             _manualTransactions.Remove(_selectedManualTransaction)
+                                             TxtManualCount.Text = $"{_manualTransactions.Count} da classificare"
+                                         End Sub)
 
             ' Reset selection
             _selectedManualTransaction = Nothing
@@ -3421,23 +3437,23 @@ Public Class SmartClassificationCenter
             BtnCreateAndApply.Content = "✅ Crea Pattern e Applica"
         End Try
     End Sub
-    
+
 #End Region
-    
+
 #Region "=== MESSAGGI UTENTE ==="
-    
+
     Private Sub ShowSuccess(message As String)
         MessageBox.Show(message, "✅ Successo", MessageBoxButton.OK, MessageBoxImage.Information)
     End Sub
-    
+
     Private Sub ShowInfo(message As String)
         MessageBox.Show(message, "ℹ️ Informazione", MessageBoxButton.OK, MessageBoxImage.Information)
     End Sub
-    
+
     Private Sub ShowWarning(message As String)
         MessageBox.Show(message, "⚠️ Attenzione", MessageBoxButton.OK, MessageBoxImage.Warning)
     End Sub
-    
+
     Private Sub ShowError(title As String, message As String)
         MessageBox.Show(message, $"❌ {title}", MessageBoxButton.OK, MessageBoxImage.Error)
     End Sub
@@ -3486,14 +3502,14 @@ Public Class SmartClassificationCenter
         Try
             ' Usa Dispatcher per assicurarsi che l'UI sia aggiornata prima dello scroll
             Dispatcher.BeginInvoke(Sub()
-                Try
-                    ' BringIntoView forza il controllo a essere visibile nell'area di scroll
-                    PreviewPanel.BringIntoView()
-                    Debug.WriteLine("DEBUG: Auto-scroll alla sezione anteprima completato")
-                Catch ex As Exception
-                    Debug.WriteLine($"DEBUG: Errore auto-scroll anteprima: {ex.Message}")
-                End Try
-            End Sub, System.Windows.Threading.DispatcherPriority.Loaded)
+                                       Try
+                                           ' BringIntoView forza il controllo a essere visibile nell'area di scroll
+                                           PreviewPanel.BringIntoView()
+                                           Debug.WriteLine("DEBUG: Auto-scroll alla sezione anteprima completato")
+                                       Catch ex As Exception
+                                           Debug.WriteLine($"DEBUG: Errore auto-scroll anteprima: {ex.Message}")
+                                       End Try
+                                   End Sub, System.Windows.Threading.DispatcherPriority.Loaded)
 
         Catch ex As Exception
             Debug.WriteLine($"DEBUG: Errore programmazione auto-scroll: {ex.Message}")
@@ -3523,7 +3539,7 @@ Public Class SmartClassificationCenter
     Private Sub ScrollToManualPanel()
         ScrollToPanel(ManualClassificationPanel)
     End Sub
-    
+
     ''' <summary>
     ''' Scroll automatico generico per qualsiasi pannello
     ''' </summary>
@@ -3532,7 +3548,7 @@ Public Class SmartClassificationCenter
             ' Metodo semplice e affidabile: usa BringIntoView
             If panel IsNot Nothing Then
                 panel.BringIntoView()
-                
+
                 ' Log per debug
                 MoneyMind.Services.LoggingService.LogInfo("ScrollToPanel", $"Scroll automatico verso pannello {panel.Name}")
             End If
@@ -3552,11 +3568,11 @@ Public Class SmartClassificationCenter
                 For Each item In _previewResults
                     item.IsSelected = True
                 Next
-                
+
                 ' Aggiorna la visualizzazione
                 PreviewDataGrid.Items.Refresh()
                 UpdateSelectionCount()
-                
+
                 MoneyMind.Services.LoggingService.LogInfo("SelectAll", $"Selezionate tutte {_previewResults.Count} transazioni")
             End If
         Catch ex As Exception
@@ -3574,11 +3590,11 @@ Public Class SmartClassificationCenter
                 For Each item In _previewResults
                     item.IsSelected = False
                 Next
-                
+
                 ' Aggiorna la visualizzazione
                 PreviewDataGrid.Items.Refresh()
                 UpdateSelectionCount()
-                
+
                 MoneyMind.Services.LoggingService.LogInfo("DeselectAll", "Deselezionate tutte le transazioni")
             End If
         Catch ex As Exception
@@ -3595,15 +3611,15 @@ Public Class SmartClassificationCenter
             If _previewResults IsNot Nothing AndAlso LblSelectionCount IsNot Nothing Then
                 Dim selectedCount As Integer = 0
                 Dim totalCount = _previewResults.Count
-                
+
                 For Each item In _previewResults
                     If item.IsSelected Then
                         selectedCount += 1
                     End If
                 Next
-                
+
                 LblSelectionCount.Text = $"Selezionate: {selectedCount}/{totalCount}"
-                
+
                 ' Abilita/disabilita pulsante approvazione selezionate
                 If BtnApproveSelected IsNot Nothing Then
                     BtnApproveSelected.IsEnabled = selectedCount > 0
@@ -3769,6 +3785,7 @@ Public Class SmartClassificationCenter
                         DataModifica = @DataModifica
                     WHERE ID = @ID"
 
+        ' Le transazioni sono nel database PERSONALE
         Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
             Await connection.OpenAsync()
             Using cmd As New SQLiteCommand(query, connection)
@@ -3830,18 +3847,16 @@ Public Class SmartClassificationCenter
             End If
 
             ' Inserisce nuovo pattern
-            Dim query = "INSERT INTO Pattern (Parola, MacroCategoria, Categoria, Necessita, Frequenza, Stagionalita, Peso)
-                        VALUES (@Parola, @MacroCategoria, @Categoria, @Necessita, @Frequenza, @Stagionalita, 5)"
+            Dim query = "INSERT INTO Pattern (Parola, MacroCategoria, Categoria, TipoFonte, Peso)
+                        VALUES (@Parola, @MacroCategoria, @Categoria, @Fonte, 5)"
 
-            Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
+            Using connection As New SQLiteConnection(GlobalDatabaseManager.GetConnectionString())
                 Await connection.OpenAsync()
                 Using cmd As New SQLiteCommand(query, connection)
                     cmd.Parameters.AddWithValue("@Parola", parolaChiave)
                     cmd.Parameters.AddWithValue("@MacroCategoria", risultato.MacroCategoria)
                     cmd.Parameters.AddWithValue("@Categoria", risultato.Categoria)
-                    cmd.Parameters.AddWithValue("@Necessita", risultato.Necessita)
-                    cmd.Parameters.AddWithValue("@Frequenza", risultato.Frequenza)
-                    cmd.Parameters.AddWithValue("@Stagionalita", risultato.Stagionalita)
+                    cmd.Parameters.AddWithValue("@Fonte", "AI")
 
                     Await cmd.ExecuteNonQueryAsync()
                 End Using
@@ -3858,7 +3873,7 @@ Public Class SmartClassificationCenter
     Private Async Function GetPatternByParola(parolaChiave As String) As Task(Of Object)
         Try
             Dim query = "SELECT COUNT(*) FROM Pattern WHERE Parola = @Parola"
-            Using connection As New SQLiteConnection(DatabaseManager.GetConnectionString())
+            Using connection As New SQLiteConnection(GlobalDatabaseManager.GetConnectionString())
                 Await connection.OpenAsync()
                 Using cmd As New SQLiteCommand(query, connection)
                     cmd.Parameters.AddWithValue("@Parola", parolaChiave)

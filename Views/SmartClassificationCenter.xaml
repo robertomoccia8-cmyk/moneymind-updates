@@ -1,0 +1,983 @@
+<Window x:Class="SmartClassificationCenter"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="🎯 Centro Classificazione Intelligente - MoneyMind AI" 
+        Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Background="Transparent"
+        AllowsTransparency="True"
+        WindowStyle="None">
+
+    <Window.Resources>
+        <!-- Stili Avanzati -->
+        <Style x:Key="ModernCard" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E3F2FD"/>
+            <Setter Property="Padding" Value="24"/>
+            <Setter Property="Margin" Value="12"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#1976D2" Direction="315" ShadowDepth="8" Opacity="0.15" BlurRadius="20"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WizardCard" TargetType="Border">
+            <Setter Property="Background" Value="#F8F9FF"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="#2196F3"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#2196F3" Direction="315" ShadowDepth="4" Opacity="0.25" BlurRadius="12"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SuccessCard" TargetType="Border">
+            <Setter Property="Background" Value="#E8F5E8"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="#4CAF50"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="8"/>
+        </Style>
+
+        <Style x:Key="WarningCard" TargetType="Border">
+            <Setter Property="Background" Value="#FFF3E0"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="#FF9800"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="8"/>
+        </Style>
+
+        <Style x:Key="MainTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#1565C0"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#2E7D32"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
+
+        <Style x:Key="StepTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#1976D2"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style x:Key="HelpText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#666"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="LineHeight" Value="18"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#1976D2"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1565C0"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#0D47A1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#BDBDBD"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#1976D2"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="#1976D2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#E3F2FD"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernProgressBar" TargetType="ProgressBar">
+            <Setter Property="Height" Value="8"/>
+            <Setter Property="Background" Value="#E0E0E0"/>
+            <Setter Property="Foreground" Value="#4CAF50"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <Rectangle Name="PART_Track" Fill="{TemplateBinding Foreground}" 
+                                     HorizontalAlignment="Left" RadiusX="4" RadiusY="4"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- Contenitore principale con sfondo gradiente -->
+    <Border Background="#F5F7FA" CornerRadius="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>  <!-- Header -->
+                <RowDefinition Height="*"/>   <!-- Contenuto principale -->
+            </Grid.RowDefinitions>
+
+            <!-- HEADER CON CONTROLLI FINESTRA -->
+            <Border Grid.Row="0" Background="#1565C0" CornerRadius="20,20,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Titolo -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="24,0">
+                        <TextBlock Text="🤖" FontSize="24" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <TextBlock Text="Centro Classificazione Intelligente" 
+                                   FontSize="18" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center"/>
+                        <Border Background="#4CAF50" CornerRadius="12" Padding="8,4" Margin="16,0,0,0">
+                            <TextBlock Text="AI POWERED" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                        </Border>
+                        <Button Name="BtnToggleWizard" Content="🧙‍♂️ Mostra Consigli" 
+                                Background="Transparent" Foreground="White" BorderThickness="1" BorderBrush="White"
+                                FontSize="12" Padding="8,4" Margin="16,0,0,0" Visibility="Collapsed"
+                                Click="BtnToggleWizard_Click"/>
+                    </StackPanel>
+                    
+                    <!-- Controlli finestra -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <Button Name="BtnMinimize" Content="−" Width="30" Height="30" 
+                                Background="Transparent" Foreground="White" BorderThickness="0"
+                                FontSize="16" FontWeight="Bold" Click="BtnMinimize_Click"/>
+                        <Button Name="BtnClose" Content="×" Width="30" Height="30" 
+                                Background="Transparent" Foreground="White" BorderThickness="0"
+                                FontSize="20" FontWeight="Bold" Margin="8,0,0,0" Click="BtnClose_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- CONTENUTO PRINCIPALE -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
+                <StackPanel>
+                    
+                    <!-- GUIDA INIZIALE / WIZARD -->
+                    <Border Name="WizardPanel" Style="{StaticResource WizardCard}" Visibility="Visible">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <TextBlock Text="🧙‍♂️" FontSize="24" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="Assistente Classificazione Guidata" Style="{StaticResource SectionTitle}"/>
+                                <Button Name="BtnHideWizard" Content="Nascondi" Style="{StaticResource SecondaryButton}" 
+                                        Margin="16,0,0,0" Padding="12,6" Click="BtnHideWizard_Click"/>
+                            </StackPanel>
+                            
+                            <TextBlock Style="{StaticResource HelpText}">
+                                <Run Text="👋 Benvenuto nel sistema di classificazione più avanzato mai creato! "/>
+                                <Run Text="Ti guiderò passo dopo passo per ottenere risultati perfetti." FontWeight="SemiBold"/>
+                            </TextBlock>
+                            
+                            <!-- Steps guidati -->
+                            <UniformGrid Columns="4" Margin="0,16,0,0">
+                                <!-- Step 1: Configurazione AI -->
+                                <Border Background="White" CornerRadius="8" Padding="16" Margin="4">
+                                    <StackPanel>
+                                        <TextBlock Text="1️⃣" FontSize="20" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Configurazione AI" FontWeight="SemiBold" FontSize="14"
+                                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Configura le chiavi API per OpenAI e Google Places nelle Impostazioni"
+                                                   FontSize="12" TextAlignment="Center" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Step 2: Seleziona Metodo -->
+                                <Border Background="White" CornerRadius="8" Padding="16" Margin="4">
+                                    <StackPanel>
+                                        <TextBlock Text="2️⃣" FontSize="20" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Seleziona Metodo" FontWeight="SemiBold" FontSize="14"
+                                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Scegli il metodo di classificazione: AI Potenziata, Solo Pattern, Offline o Manuale"
+                                                   FontSize="12" TextAlignment="Center" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Step 3: Seleziona Scope -->
+                                <Border Background="White" CornerRadius="8" Padding="16" Margin="4">
+                                    <StackPanel>
+                                        <TextBlock Text="3️⃣" FontSize="20" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Seleziona Scope" FontWeight="SemiBold" FontSize="14"
+                                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Scegli cosa classificare: Non Classificate, Tutte, Singola o Test Transazione"
+                                                   FontSize="12" TextAlignment="Center" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Step 4: Avvia Classificazione -->
+                                <Border Background="White" CornerRadius="8" Padding="16" Margin="4">
+                                    <StackPanel>
+                                        <TextBlock Text="4️⃣" FontSize="20" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Avvia Classificazione" FontWeight="SemiBold" FontSize="14"
+                                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Clicca 'Avvia Classificazione' e lascia lavorare il sistema intelligente"
+                                                   FontSize="12" TextAlignment="Center" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- DASHBOARD STATISTICHE -->
+                    <Border Style="{StaticResource ModernCard}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                <TextBlock Text="📊" FontSize="24" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="Dashboard Classificazioni" Style="{StaticResource SectionTitle}"/>
+                                <Button Name="BtnRefreshStats" Content="🔄 Aggiorna" Style="{StaticResource SecondaryButton}" 
+                                        Margin="20,0,0,0" Padding="12,6" Click="BtnRefreshStats_Click"/>
+                            </StackPanel>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Transazioni Totali -->
+                                <Border Grid.Column="0" Background="#E3F2FD" CornerRadius="12" Padding="20" Margin="0,0,12,0">
+                                    <StackPanel>
+                                        <TextBlock Text="📝 Transazioni Totali" FontSize="14" Foreground="#1565C0" Margin="0,0,0,8"/>
+                                        <TextBlock Name="TxtTotalTransactions" Text="0" FontSize="32" FontWeight="Bold" 
+                                                   Foreground="#0D47A1" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                
+                                <!-- Classificate -->
+                                <Border Grid.Column="1" Background="#E8F5E8" CornerRadius="12" Padding="20" Margin="6,0">
+                                    <StackPanel>
+                                        <TextBlock Text="✅ Classificate" FontSize="14" Foreground="#2E7D32" Margin="0,0,0,8"/>
+                                        <TextBlock Name="TxtClassifiedTransactions" Text="0" FontSize="32" FontWeight="Bold" 
+                                                   Foreground="#1B5E20" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                
+                                <!-- Non Classificate -->
+                                <Border Grid.Column="2" Background="#FFF3E0" CornerRadius="12" Padding="20" Margin="6,0">
+                                    <StackPanel>
+                                        <TextBlock Text="⚠️ Da Classificare" FontSize="14" Foreground="#F57C00" Margin="0,0,0,8"/>
+                                        <TextBlock Name="TxtUnclassifiedTransactions" Text="0" FontSize="32" FontWeight="Bold" 
+                                                   Foreground="#E65100" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                
+                                <!-- Tasso di Successo -->
+                                <Border Grid.Column="3" Background="#F3E5F5" CornerRadius="12" Padding="20" Margin="12,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="🎯 Tasso Successo" FontSize="14" Foreground="#7B1FA2" Margin="0,0,0,8"/>
+                                        <TextBlock Name="TxtClassificationRate" Text="0%" FontSize="32" FontWeight="Bold" 
+                                                   Foreground="#4A148C" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Progress Bar Generale -->
+                            <StackPanel Margin="0,20,0,0">
+                                <TextBlock Text="Progresso Classificazione Generale:" FontSize="14" Foreground="#666" Margin="0,0,0,8"/>
+                                <ProgressBar Name="ProgressBarOverall" Style="{StaticResource ModernProgressBar}" Value="0" Maximum="100"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- COLONNA SINISTRA: CONTROLLI -->
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            
+                            <!-- CONFIGURAZIONE AI -->
+                            <Border Style="{StaticResource ModernCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                        <TextBlock Text="🤖" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Configurazione AI" Style="{StaticResource SectionTitle}"/>
+                                        <Border Name="StatusAI" Background="#F44336" CornerRadius="8" Padding="6,2" Margin="12,0,0,0">
+                                            <TextBlock Name="TxtStatusAI" Text="NON CONFIGURATA" FontSize="10" 
+                                                       FontWeight="Bold" Foreground="White"/>
+                                        </Border>
+                                    </StackPanel>
+                                    
+                                    <Border Style="{StaticResource WarningCard}" Name="AIWarningPanel">
+                                        <StackPanel>
+                                            <TextBlock Text="⚠️ Per ottenere risultati ottimali, configura le API:" 
+                                                       FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Style="{StaticResource HelpText}">
+                                                • <Run FontWeight="SemiBold">OpenAI</Run>: Per l'analisi intelligente delle transazioni<LineBreak/>
+                                                • <Run FontWeight="SemiBold">Google Places</Run>: Per identificare aziende e attività<LineBreak/>
+                                                • Anche senza API, il sistema funziona in modalità offline!
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                    
+                                    <Button Name="BtnOpenSettings" Content="⚙️ Configura API Keys nelle Impostazioni"
+                                            Style="{StaticResource PrimaryButton}" Margin="0,8,0,0"
+                                            Click="BtnOpenSettings_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- METODI DI CLASSIFICAZIONE -->
+                            <Border Style="{StaticResource ModernCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                        <TextBlock Text="🎯" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Metodi di Classificazione" Style="{StaticResource SectionTitle}"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Opzioni di classificazione -->
+                                    <StackPanel>
+                                        <RadioButton Name="RadioPatternOnly" Content="Solo Pattern Esistenti" 
+                                                     GroupName="ClassificationMethod" Margin="0,0,0,12"/>
+                                        <TextBlock Text="Usa solo i pattern già salvati nel database (veloce, offline)"
+                                                   Style="{StaticResource HelpText}" Margin="20,0,0,16"/>
+                                        
+                                        <RadioButton Name="RadioAIEnhanced" Content="AI Potenziata (Consigliato)" 
+                                                     GroupName="ClassificationMethod" IsChecked="True" Margin="0,0,0,12"/>
+                                        <TextBlock Text="Combina pattern esistenti + AI + Google Places (massima precisione)"
+                                                   Style="{StaticResource HelpText}" Margin="20,0,0,16"/>
+                                        
+                                        <RadioButton Name="RadioOfflineOnly" Content="Solo Modalità Offline" 
+                                                     GroupName="ClassificationMethod" Margin="0,0,0,12"/>
+                                        <TextBlock Text="Funziona sempre, anche senza internet (estrazione intelligente)"
+                                                   Style="{StaticResource HelpText}" Margin="20,0,0,16"/>
+                                        
+                                        <RadioButton Name="RadioManualOnly" Content="Classificazione Manuale" 
+                                                     GroupName="ClassificationMethod" Margin="0,0,0,12"/>
+                                        <TextBlock Text="Apre il pannello per classificazione manuale delle transazioni"
+                                                   Style="{StaticResource HelpText}" Margin="20,0,0,16"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Opzioni avanzate -->
+                                    <Expander Header="⚙️ Opzioni Avanzate" Margin="0,16,0,0">
+                                        <StackPanel Margin="20,8,0,0">
+                                            <CheckBox Name="ChkAutoSavePatterns" Content="Salva automaticamente nuovi pattern" 
+                                                      IsChecked="True" Margin="0,0,0,8"/>
+                                            <CheckBox Name="ChkUpdateExistingPatterns" Content="Aggiorna pesi pattern esistenti" 
+                                                      IsChecked="True" Margin="0,0,0,8"/>
+                                            <CheckBox Name="ChkShowDetailedLog" Content="Mostra log dettagliato" 
+                                                      Margin="0,0,0,8"/>
+                                        </StackPanel>
+                                    </Expander>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+
+                        <!-- COLONNA DESTRA: AZIONI E RISULTATI -->
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                            
+                            <!-- CONTROLLI PRINCIPALI -->
+                            <Border Style="{StaticResource ModernCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                        <TextBlock Text="🚀" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Centro di Controllo" Style="{StaticResource SectionTitle}"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Selezione scope di classificazione -->
+                                    <TextBlock Text="Scope di Classificazione" Style="{StaticResource StepTitle}" Margin="0,8,0,0"/>
+                                    <StackPanel Margin="0,0,0,12">
+                                        <RadioButton Name="RadioScopeUnmatched" Content="📋 Solo Transazioni Non Classificate"
+                                                     GroupName="ClassificationScope" IsChecked="True" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Classifica solo le transazioni senza MacroCategoria o con 'Non Classificata'"
+                                                   Style="{StaticResource HelpText}" Margin="20,0,0,8"/>
+
+                                        <RadioButton Name="RadioScopeAll" Content="🔄 Tutte le Transazioni (Riclassifica)"
+                                                     GroupName="ClassificationScope" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Rimuove classificazioni esistenti e riapplica il metodo selezionato a tutte"
+                                                   Style="{StaticResource HelpText}" Margin="20,0,0,8"/>
+
+                                        <RadioButton Name="RadioScopeSingle" Content="🎯 Singola Transazione"
+                                                     GroupName="ClassificationScope" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Apre il pannello per selezionare e classificare una singola transazione dal database"
+                                                   Style="{StaticResource HelpText}" Margin="20,0,0,8"/>
+
+                                        <RadioButton Name="RadioScopeTest" Content="🧪 Test Singola Transazione"
+                                                     GroupName="ClassificationScope" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Testa una descrizione personalizzata senza creare pattern o modificare il database"
+                                                   Style="{StaticResource HelpText}" Margin="20,0,0,8"/>
+
+                                    </StackPanel>
+
+                                    <!-- Pulsante principale -->
+                                    <Button Name="BtnStartClassification" Content="🚀 Avvia Classificazione"
+                                            Style="{StaticResource PrimaryButton}" Margin="0,0,0,12"
+                                            Click="BtnStartClassification_Click"/>
+
+                                    <Button Name="BtnViewPatterns" Content="📝 Gestisci Pattern"
+                                            Style="{StaticResource SecondaryButton}" Margin="0,0,0,12"
+                                            Click="BtnViewPatterns_Click"/>
+                                    
+                                    <!-- Progress e Status -->
+                                    <StackPanel Name="ProgressPanel" Visibility="Collapsed">
+                                        <TextBlock Name="LblProgressStatus" Text="Pronto per l'avvio..." 
+                                                   FontSize="14" Margin="0,0,0,8"/>
+                                        <ProgressBar Name="ProgressBarClassification" Style="{StaticResource ModernProgressBar}" 
+                                                     Value="0" Maximum="100" Margin="0,0,0,8"/>
+                                        <TextBlock Name="LblProgressDetail" Text="" FontSize="12" Foreground="#666"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- RISULTATI ULTIMA CLASSIFICAZIONE -->
+                            <Border Style="{StaticResource ModernCard}" Name="ResultsPanel" Visibility="Collapsed">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                        <TextBlock Text="📈" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Risultati Ultima Classificazione" Style="{StaticResource SectionTitle}"/>
+                                    </StackPanel>
+                                    
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <Border Grid.Column="0" Background="#E8F5E8" CornerRadius="8" Padding="12" Margin="0,0,6,0">
+                                            <StackPanel>
+                                                <TextBlock Text="✅ Elaborate" FontSize="12" Foreground="#2E7D32"/>
+                                                <TextBlock Name="TxtProcessed" Text="0" FontSize="20" FontWeight="Bold" Foreground="#1B5E20"/>
+                                            </StackPanel>
+                                        </Border>
+                                        
+                                        <Border Grid.Column="1" Background="#E3F2FD" CornerRadius="8" Padding="12" Margin="6,0,0,0">
+                                            <StackPanel>
+                                                <TextBlock Text="🎯 Classificate" FontSize="12" Foreground="#1565C0"/>
+                                                <TextBlock Name="TxtSuccessful" Text="0" FontSize="20" FontWeight="Bold" Foreground="#0D47A1"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                    
+                                    <TextBlock Name="TxtResultSummary" Text="" Margin="0,12,0,0" 
+                                               FontSize="13" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- CONSIGLI DINAMICI -->
+                            <Border Name="TipsPanel" Style="{StaticResource SuccessCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                        <TextBlock Text="💡" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Consiglio Smart" FontWeight="SemiBold" FontSize="14"/>
+                                        <Button Name="BtnNextTip" Content="➡️" Background="Transparent" BorderThickness="0" 
+                                                Margin="12,0,0,0" Click="BtnNextTip_Click"/>
+                                    </StackPanel>
+                                    <TextBlock Name="TxtCurrentTip" TextWrapping="Wrap" FontSize="13">
+                                        Prima di iniziare, assicurati di avere almeno 10-20 transazioni da classificare per ottenere risultati significativi.
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- TEST SINGOLA TRANSAZIONE (nascosto di default) -->
+                    <Border Name="SingleTestPanel" Style="{StaticResource ModernCard}" Visibility="Collapsed">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <TextBlock Text="🧪" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="Test Singola Transazione" Style="{StaticResource SectionTitle}"/>
+                                <Button Name="BtnCloseSingleTest" Content="✖️ Chiudi" Style="{StaticResource SecondaryButton}" 
+                                        Margin="20,0,0,0" Padding="8,4" Click="BtnCloseSingleTest_Click"/>
+                            </StackPanel>
+                            
+                            <TextBlock Text="Inserisci una descrizione di transazione per testare il sistema:"
+                                       Style="{StaticResource HelpText}"/>
+                            
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                                    <TextBox Name="TxtTestDescription" Width="300" Height="40" Padding="8" 
+                                             Text="ACQUISTO C/O ESSELUNGA SRL VIA ROMA 123" 
+                                             VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBox Name="TxtTestAmount" Width="80" Height="40" Padding="8" Margin="12,0,0,0"
+                                             Text="45,67" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Text="€" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                    <Button Name="BtnRunSingleTest" Content="🚀 Testa" Style="{StaticResource PrimaryButton}" 
+                                            Margin="16,0,0,0" Padding="16,6" Click="BtnRunSingleTest_Click"/>
+                                </StackPanel>
+                                
+                                <!-- Risultato test -->
+                                <Border Name="SingleTestResult" Grid.Row="1" Style="{StaticResource WizardCard}" 
+                                        Visibility="Collapsed" Margin="0,8,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="📋 Risultato:" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Pattern:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                            <TextBlock Grid.Row="0" Grid.Column="1" Name="TxtTestPattern" Text="-" Margin="0,0,0,4"/>
+
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Parola chiave estratta:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                            <TextBlock Grid.Row="1" Grid.Column="1" Name="TxtTestParolaChiave" Text="-" Margin="0,0,0,4"/>
+
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="MacroCategoria:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                            <TextBlock Grid.Row="2" Grid.Column="1" Name="TxtTestMacro" Text="-" Margin="0,0,0,4"/>
+
+                                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Categoria:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                            <TextBlock Grid.Row="3" Grid.Column="1" Name="TxtTestCategory" Text="-" Margin="0,0,0,4"/>
+
+                                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Confidenza:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,4">
+                                                <TextBlock Name="TxtTestConfidence" Text="-"/>
+                                                <Border Name="ConfidenceBadge" Background="#4CAF50" CornerRadius="4"
+                                                        Padding="6,2" Margin="8,0,0,0">
+                                                    <TextBlock Name="TxtTestConfidenceLevel" Text="ALTA" FontSize="10"
+                                                               FontWeight="Bold" Foreground="White"/>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Metodo:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                            <TextBlock Grid.Row="5" Grid.Column="1" Name="TxtTestMethod" Text="-" Margin="0,0,0,4"/>
+
+                                            <!-- Informazioni AI aggiuntive (visibili solo per società riconosciute) -->
+                                            <TextBlock Grid.Row="6" Grid.Column="0" Name="LblTestSummary" Text="Sommario Società:" FontWeight="SemiBold" Margin="0,0,8,4" Visibility="Collapsed"/>
+                                            <TextBlock Grid.Row="6" Grid.Column="1" Name="TxtTestSummary" Text="-" Margin="0,0,0,4" Visibility="Collapsed" TextWrapping="Wrap"/>
+
+                                            <TextBlock Grid.Row="7" Grid.Column="0" Name="LblTestActivity" Text="Descrizione Attività:" FontWeight="SemiBold" Margin="0,0,8,4" Visibility="Collapsed"/>
+                                            <TextBlock Grid.Row="7" Grid.Column="1" Name="TxtTestActivity" Text="-" Margin="0,0,0,4" Visibility="Collapsed" TextWrapping="Wrap"/>
+
+                                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Motivazione:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                            <TextBlock Grid.Row="8" Grid.Column="1" Name="TxtTestMotivazione" Text="-" Margin="0,0,0,4" TextWrapping="Wrap"/>
+
+                                            <TextBlock Grid.Row="9" Grid.Column="0" Text="Tempo:" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                            <TextBlock Grid.Row="9" Grid.Column="1" Name="TxtTestTime" Text="-"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CLASSIFICAZIONE SINGOLA TRANSAZIONE (NUOVO PANNELLO) -->
+                    <Border Name="SingleClassificationPanel" Style="{StaticResource ModernCard}" Visibility="Collapsed">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <TextBlock Text="🎯" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="Classificazione Singola da Database" Style="{StaticResource SectionTitle}"/>
+                            </StackPanel>
+
+                            <!-- Info pannello -->
+                            <Border Background="#E3F2FD" CornerRadius="8" Padding="12" Margin="0,0,0,16">
+                                <StackPanel>
+                                    <TextBlock Text="📋 Seleziona una transazione non classificata dalla lista sottostante"
+                                               FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <TextBlock Name="TxtSingleMethodInfo" Text="Metodo: AI Potenziata"
+                                               FontSize="12" Foreground="#1976D2"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Lista transazioni non classificate -->
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="300"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Header lista -->
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                    <TextBlock Text="Transazioni Non Classificate" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <Button Name="BtnRefreshSingleList" Content="🔄" Style="{StaticResource SecondaryButton}"
+                                            Width="30" Height="30" Margin="8,0,0,0" Padding="0"
+                                            Click="BtnRefreshSingleList_Click" ToolTip="Ricarica lista"/>
+                                    <TextBlock Name="TxtSingleTransactionCount" Text="(0 trovate)"
+                                               Margin="8,0,0,0" VerticalAlignment="Center" FontSize="12"
+                                               Foreground="#666"/>
+                                </StackPanel>
+
+                                <!-- Lista transazioni -->
+                                <Border Grid.Row="1" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
+                                    <DataGrid Name="DgSingleTransactions" Style="{StaticResource ModernDataGrid}"
+                                              BorderThickness="0" GridLinesVisibility="Horizontal"
+                                              HorizontalGridLinesBrush="#F0F0F0"
+                                              SelectionMode="Single" SelectionUnit="FullRow"
+                                              SelectionChanged="DgSingleTransactions_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Data" Binding="{Binding DataFormatted}" Width="80"/>
+                                            <DataGridTextColumn Header="Importo" Binding="{Binding ImportoFormatted}" Width="100" IsReadOnly="True">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="TextAlignment" Value="Right"/>
+                                                        <Setter Property="FontFamily" Value="Consolas"/>
+                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                        <Setter Property="Foreground" Value="{Binding ImportoColor}"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Header="Descrizione" Binding="{Binding Descrizione}" Width="*"/>
+                                            <DataGridTextColumn Header="Parola Estratta" Binding="{Binding ParolaChiaveEstratta}" Width="120"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Border>
+
+                                <!-- Controlli classificazione -->
+                                <UniformGrid Grid.Row="2" Columns="2" Margin="0,16,0,0">
+                                    <Button Name="BtnClassifySelectedSingle" Content="🚀 Classifica Selezionata"
+                                            Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"
+                                            Click="BtnClassifySelectedSingle_Click" IsEnabled="False"/>
+                                    <Button Name="BtnCancelSingleClassification" Content="❌ Annulla"
+                                            Style="{StaticResource SecondaryButton}" Margin="8,0,0,0"
+                                            Click="BtnCancelSingleClassification_Click"/>
+                                </UniformGrid>
+                            </Grid>
+
+                            <!-- Anteprima risultato classificazione -->
+                            <Border Name="SingleClassificationResult" Style="{StaticResource ModernCard}"
+                                    Background="#F8F9FA" Visibility="Collapsed" Margin="0,16,0,0">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                        <TextBlock Text="📊" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Anteprima Classificazione" FontWeight="SemiBold" FontSize="14"/>
+                                    </StackPanel>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Transazione:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Name="TxtSingleTransactionDetails" Text="-" Margin="0,0,0,4"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="MacroCategoria:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Name="TxtSingleMacro" Text="-" Margin="0,0,0,4"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Categoria:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Name="TxtSingleCategory" Text="-" Margin="0,0,0,4"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Confidenza:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,4">
+                                            <TextBlock Name="TxtSingleConfidence" Text="-"/>
+                                            <Border Name="SingleConfidenceBadge" Background="#4CAF50" CornerRadius="4"
+                                                    Padding="6,2" Margin="8,0,0,0">
+                                                <TextBlock Name="TxtSingleConfidenceLevel" Text="ALTA" FontSize="10"
+                                                           FontWeight="Bold" Foreground="White"/>
+                                            </Border>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Metodo:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="1" Name="TxtSingleMethod" Text="-" Margin="0,0,0,4"/>
+
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Tempo:" FontWeight="SemiBold" Margin="0,0,8,4"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="1" Name="TxtSingleTime" Text="-" Margin="0,0,0,4"/>
+
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Motivazione:" FontWeight="SemiBold" Margin="0,0,8,8"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="1" Name="TxtSingleMotivation" Text="-" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                    </Grid>
+
+                                    <!-- Pulsanti azione -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                                        <Button Name="BtnApplySingleClassification" Content="✅ Applica Classificazione"
+                                                Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"
+                                                Click="BtnApplySingleClassification_Click"/>
+                                        <Button Name="BtnSaveSinglePattern" Content="💾 Salva Pattern"
+                                                Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                                                Click="BtnSaveSinglePattern_Click"/>
+                                        <Button Name="BtnDiscardSingleResult" Content="❌ Scarta"
+                                                Style="{StaticResource SecondaryButton}"
+                                                Click="BtnDiscardSingleResult_Click"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ANTEPRIMA CLASSIFICAZIONI CON APPROVAZIONE -->
+                    <Border Name="PreviewPanel" Style="{StaticResource ModernCard}" Visibility="Collapsed">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <TextBlock Text="📋" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="Anteprima Classificazioni" Style="{StaticResource SectionTitle}"/>
+                                <Border Background="#FF9800" CornerRadius="12" Padding="8,4" Margin="16,0,0,0">
+                                    <TextBlock Name="TxtPreviewCount" Text="0 transazioni" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                                </Border>
+                                <Button Name="BtnClosePreview" Content="✖️ Chiudi" Style="{StaticResource SecondaryButton}" 
+                                        Margin="20,0,0,0" Padding="8,4" Click="BtnClosePreview_Click"/>
+                            </StackPanel>
+                            
+                            <TextBlock Text="Verifica le classificazioni proposte prima di applicarle. Puoi modificare quelle che non ti convincono."
+                                       Style="{StaticResource HelpText}"/>
+                            
+                            <!-- Lista anteprima -->
+                            <Border Background="#F8F9FF" CornerRadius="8" Padding="16" MaxHeight="200">
+                                <DataGrid Name="PreviewDataGrid"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          HeadersVisibility="Column"
+                                          GridLinesVisibility="Horizontal"
+                                          AlternatingRowBackground="#F0F0F0"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          AutoGenerateColumns="False"
+                                          IsReadOnly="False"
+                                          SelectionMode="Extended"
+                                          CanUserResizeColumns="True"
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                          ScrollViewer.CanContentScroll="True"
+                                          VirtualizingPanel.IsVirtualizing="True"
+                                          VirtualizingPanel.VirtualizationMode="Recycling"
+                                          VirtualizingPanel.IsContainerVirtualizable="True"
+                                          EnableRowVirtualization="True"
+                                          EnableColumnVirtualization="True">
+                                        <DataGrid.Columns>
+                                            <!-- Colonna checkbox per selezione -->
+                                            <DataGridCheckBoxColumn Header="✓" Width="40" Binding="{Binding IsSelected}" />
+                                            <DataGridTextColumn Header="Descrizione" Binding="{Binding Descrizione}" Width="300" IsReadOnly="True">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="ToolTip" Value="{Binding OriginalTransaction.Descrizione}"/>
+                                                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Header="Parola Chiave" Binding="{Binding ParolaChiave}" Width="120" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Importo" Binding="{Binding ImportoFormatted}" Width="80" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="MacroCategoria" Binding="{Binding MacroCategoriaDisplay}" Width="120" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Categoria" Binding="{Binding CategoriaDisplay}" Width="120" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Confidenza" Binding="{Binding ConfidenzaFormatted}" Width="80" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Metodo" Binding="{Binding MetodoClassificazione}" Width="100" IsReadOnly="True"/>
+                                        </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                            
+                            <!-- Pulsanti selezione rapida -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,8">
+                                <Button Name="BtnSelectAll" Content="☑️ Seleziona Tutte" Style="{StaticResource SecondaryButton}" 
+                                        Margin="0,0,8,0" Click="BtnSelectAll_Click" FontSize="11"/>
+                                <Button Name="BtnDeselectAll" Content="☐ Deseleziona Tutte" Style="{StaticResource SecondaryButton}" 
+                                        Margin="0,0,8,0" Click="BtnDeselectAll_Click" FontSize="11"/>
+                                <TextBlock Name="LblSelectionCount" Text="" Style="{StaticResource HelpText}" 
+                                           VerticalAlignment="Center" Margin="12,0,0,0"/>
+                            </StackPanel>
+                            
+                            <!-- Status approvazione -->
+                            <TextBlock Name="LblPreviewStatus" Text="" Style="{StaticResource HelpText}" 
+                                       HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                            
+                            <!-- Pulsanti approvazione -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+                                <Button Name="BtnApproveAll" Content="✅ Approva Tutte" Style="{StaticResource PrimaryButton}" 
+                                        Margin="0,0,12,0" Click="BtnApproveAll_Click"/>
+                                <Button Name="BtnApproveSelected" Content="✅ Approva Solo Selezionate" Style="{StaticResource SecondaryButton}" 
+                                        Margin="0,0,12,0" Click="BtnApproveSelected_Click"/>
+                                <Button Name="BtnCancelPreview" Content="❌ Annulla" Style="{StaticResource SecondaryButton}" 
+                                        Click="BtnCancelPreview_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CLASSIFICAZIONE MANUALE -->
+                    <Border Name="ManualClassificationPanel" Style="{StaticResource ModernCard}" Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- PULSANTE CHIUDI IN ALTO A DESTRA -->
+                            <Button Name="BtnCloseManual" Content="✖️ Chiudi" Style="{StaticResource SecondaryButton}" 
+                                    Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Margin="0,8,8,0" Padding="8,4" Click="BtnCloseManual_Click"/>
+                            
+                            <!-- COLONNA SINISTRA: LISTA TRANSAZIONI -->
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <TextBlock Text="👤" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Classificazione Manuale" Style="{StaticResource SectionTitle}"/>
+                                    <Border Background="#2196F3" CornerRadius="12" Padding="8,4" Margin="16,0,0,0">
+                                        <TextBlock Name="TxtManualCount" Text="0 da classificare" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                                    </Border>
+                                </StackPanel>
+                                
+                                <TextBlock Text="Seleziona una transazione da classificare manualmente:"
+                                           Style="{StaticResource HelpText}" Margin="0,0,0,12"/>
+                                
+                                <!-- Lista transazioni -->
+                                <Border Background="#F8F9FF" CornerRadius="8" Padding="8" MaxHeight="300">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <ListBox Name="ManualTransactionsList" 
+                                                 Background="Transparent" 
+                                                 BorderThickness="0"
+                                                 SelectionChanged="ManualTransactionsList_SelectionChanged">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="White" CornerRadius="4" Padding="8" Margin="0,2">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Descrizione}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                                <TextBlock Text="{Binding ImportoFormatted}" FontWeight="Bold" 
+                                                                           Foreground="{Binding ImportoColor}" Margin="0,0,16,0"/>
+                                                                <TextBlock Text="{Binding DataFormatted}" Foreground="#666"/>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </ScrollViewer>
+                                </Border>
+                                
+                                <Button Name="BtnRefreshManualList" Content="🔄 Aggiorna Lista" 
+                                        Style="{StaticResource SecondaryButton}" Margin="0,12,0,0"
+                                        Click="BtnRefreshManualList_Click"/>
+                            </StackPanel>
+                            
+                            <!-- COLONNA DESTRA: CREAZIONE PATTERN -->
+                            <StackPanel Grid.Column="1" Margin="10,40,0,0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <TextBlock Text="📝" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Crea Nuovo Pattern" Style="{StaticResource SectionTitle}"/>
+                                </StackPanel>
+                                
+                                <!-- Dettagli transazione selezionata -->
+                                <Border Name="SelectedTransactionPanel" Style="{StaticResource ModernCard}" Visibility="Collapsed">
+                                    <StackPanel>
+                                        <TextBlock Text="Transazione Selezionata:" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <TextBlock Name="SelectedTransactionDesc" Text="" TextWrapping="Wrap" 
+                                                   FontSize="12" Foreground="#333" Margin="0,0,0,4"/>
+                                        <TextBlock Name="SelectedTransactionAmount" Text="" 
+                                                   FontSize="12" Foreground="#666"/>
+                                    </StackPanel>
+                                </Border>
+                                
+                                <!-- Form creazione pattern -->
+                                <StackPanel Name="PatternCreationForm" IsEnabled="False">
+                                    <TextBlock Text="Parola Chiave (estratta automaticamente):" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <TextBox Name="TxtKeyword" Margin="0,4,0,12" Style="{StaticResource ModernTextBox}"/>
+                                    
+                                    <TextBlock Text="MacroCategoria:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <ComboBox Name="CmbMacroCategoria" Margin="0,4,0,12" Style="{StaticResource ModernComboBox}" IsEditable="True"/>
+                                    
+                                    <TextBlock Text="Categoria:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <ComboBox Name="CmbCategoria" Margin="0,4,0,12" Style="{StaticResource ModernComboBox}" IsEditable="True"/>
+                                    
+                                    <TextBlock Text="Necessità:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <ComboBox Name="CmbNecessita" Margin="0,4,0,12" Style="{StaticResource ModernComboBox}">
+                                        <ComboBoxItem Content="Essenziale"/>
+                                        <ComboBoxItem Content="Importante"/>
+                                        <ComboBoxItem Content="Utile"/>
+                                        <ComboBoxItem Content="Superfluo"/>
+                                    </ComboBox>
+                                    
+                                    <TextBlock Text="Frequenza:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <ComboBox Name="CmbFrequenza" Margin="0,4,0,12" Style="{StaticResource ModernComboBox}">
+                                        <ComboBoxItem Content="Quotidiana"/>
+                                        <ComboBoxItem Content="Settimanale"/>
+                                        <ComboBoxItem Content="Mensile"/>
+                                        <ComboBoxItem Content="Trimestrale"/>
+                                        <ComboBoxItem Content="Annuale"/>
+                                        <ComboBoxItem Content="Sporadica"/>
+                                    </ComboBox>
+                                    
+                                    <TextBlock Text="Stagionalità:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <ComboBox Name="CmbStagionalita" Margin="0,4,0,16" Style="{StaticResource ModernComboBox}">
+                                        <ComboBoxItem Content="Tutto l'anno"/>
+                                        <ComboBoxItem Content="Primavera"/>
+                                        <ComboBoxItem Content="Estate"/>
+                                        <ComboBoxItem Content="Autunno"/>
+                                        <ComboBoxItem Content="Inverno"/>
+                                        <ComboBoxItem Content="Festività"/>
+                                    </ComboBox>
+                                    
+                                    <Button Name="BtnCreateAndApply" Content="✅ Crea Pattern e Applica" 
+                                            Style="{StaticResource PrimaryButton}" 
+                                            Click="BtnCreateAndApply_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</Window>
