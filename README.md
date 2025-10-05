@@ -11,7 +11,7 @@ Scarica sempre l'ultima versione dalla sezione [Releases](https://github.com/rob
 - **Sistema Operativo:** Windows 10/11 (64-bit)
 - **Framework:** .NET 8.0 Runtime
 - **RAM:** 4 GB (8 GB raccomandati)
-- **Spazio su disco:** 100 MB liberi
+- **Spazio su disco:** 180 MB liberi
 
 ## Installazione
 
@@ -32,4 +32,5 @@ Per problemi o domande, contatta il supporto tecnico.
 
 ---
 
-**Nota:** Questo repository è utilizzato esclusivamente per la distribuzione degli aggiornamenti dell'applicazione MoneyMind WPF.
+
+**Nota:** Questo repository è utilizzato esclusivamente per la distribuzione degli aggiornamenti dell'applicazione MoneyMind.
