@@ -8,7 +8,7 @@
     <RootNamespace>MoneyMind</RootNamespace>
     <AssemblyName>MoneyMind</AssemblyName>
     <!-- ⚠️ LA VERSIONE È CENTRALIZZATA IN VersionManager.vb - MODIFICA SOLO QUELLO! ⚠️ -->
-    <Version>1.4.14</Version>
+    <Version>1.4.15</Version>
     <ApplicationIcon>Icon\app.ico</ApplicationIcon>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>

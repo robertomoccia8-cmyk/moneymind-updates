@@ -26,26 +26,63 @@ Public Class GlobalDatabaseManager
     ''' Ottiene il percorso del database globale
     ''' </summary>
     Public Shared Function GetDatabasePath() As String
-        ' Prova ApplicationData, se fallisce usa LocalApplicationData come fallback
-        Dim appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+        Try
+            ' Prova ApplicationData, se fallisce usa LocalApplicationData come fallback
+            Dim appDataPath As String = Nothing
 
-        ' Se ApplicationData è null o vuoto, prova LocalApplicationData
-        If String.IsNullOrEmpty(appDataPath) Then
-            appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-        End If
+            Try
+                appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+            Catch ex As Exception
+                Debug.WriteLine($"[GlobalDB] Errore ApplicationData: {ex.Message}")
+            End Try
 
-        ' Se ancora null, usa directory corrente come ultima risorsa
-        If String.IsNullOrEmpty(appDataPath) Then
-            appDataPath = Path.Combine(Environment.CurrentDirectory, "Data")
-        End If
+            ' Se ApplicationData è null o vuoto, prova LocalApplicationData
+            If String.IsNullOrEmpty(appDataPath) Then
+                Try
+                    appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                Catch ex As Exception
+                    Debug.WriteLine($"[GlobalDB] Errore LocalApplicationData: {ex.Message}")
+                End Try
+            End If
 
-        Dim moneyMindFolder = Path.Combine(appDataPath, "MoneyMind")
+            ' Se ancora null, usa directory corrente come ultima risorsa
+            If String.IsNullOrEmpty(appDataPath) Then
+                Try
+                    Dim currentDir = Environment.CurrentDirectory
+                    If Not String.IsNullOrEmpty(currentDir) Then
+                        appDataPath = Path.Combine(currentDir, "Data")
+                    End If
+                Catch ex As Exception
+                    Debug.WriteLine($"[GlobalDB] Errore CurrentDirectory: {ex.Message}")
+                End Try
+            End If
 
-        If Not Directory.Exists(moneyMindFolder) Then
-            Directory.CreateDirectory(moneyMindFolder)
-        End If
+            ' Ultimo fallback: usa path relativo
+            If String.IsNullOrEmpty(appDataPath) Then
+                appDataPath = "Data"
+            End If
 
-        Return Path.Combine(moneyMindFolder, "MoneyMind_Global.db")
+            Dim moneyMindFolder = Path.Combine(appDataPath, "MoneyMind")
+
+            If Not Directory.Exists(moneyMindFolder) Then
+                Directory.CreateDirectory(moneyMindFolder)
+            End If
+
+            Return Path.Combine(moneyMindFolder, "MoneyMind_Global.db")
+        Catch ex As Exception
+            ' Ultimo tentativo con path hardcoded
+            Debug.WriteLine($"[GlobalDB] ERRORE CRITICO: {ex.Message}")
+
+            Dim fallbackPath = "MoneyMind\MoneyMind_Global.db"
+
+            ' Crea cartella se serve
+            Dim dir = Path.GetDirectoryName(fallbackPath)
+            If Not String.IsNullOrEmpty(dir) AndAlso Not Directory.Exists(dir) Then
+                Directory.CreateDirectory(dir)
+            End If
+
+            Return fallbackPath
+        End Try
     End Function
 
     ''' <summary>
@@ -57,7 +94,10 @@ Public Class GlobalDatabaseManager
 
             Try
                 Dim dbPath = GetDatabasePath()
-                _connectionString = $"Data Source={dbPath};Version=3;Busy Timeout=5000;Pooling=true;Max Pool Size=100;"
+                Dim absolutePath = Path.GetFullPath(dbPath)
+
+                ' Connection string minimal - parseViaFramework=true (default) è necessario
+                _connectionString = $"Data Source={absolutePath}"
 
                 Using conn As New SQLiteConnection(_connectionString)
                     conn.Open()
